@@ -1,0 +1,139 @@
+[[local|localrc]]
+ADMIN_PASSWORD=admin
+DATABASE_PASSWORD=admin
+RABBIT_PASSWORD=admin
+SERVICE_PASSWORD=admin
+SERVICE_TOKEN=admin
+
+# Origin git repository
+GIT_BASE=https://opendev.org
+# Custom git repository
+CUSTOM_GIT_BASE=https://github.com/taurus-openstack
+CUSTOM_GIT_BRANCH=stable/2024.1
+# Reclone
+# RECLONE=True
+
+# Enable logging
+LOGFILE=$DEST/logs/stack.sh.log
+VERBOSE=True
+LOG_COLOR=True
+LOGDAYS=2
+
+# Host IP
+HOST_IP=10.100.10.199
+
+# Keystone
+KEYSTONE_REPO=$CUSTOM_GIT_BASE/keystone.git
+KEYSTONE_BRANCH=$CUSTOM_GIT_BRANCH
+# Nova
+NOVA_REPO=$CUSTOM_GIT_BASE/nova.git
+NOVA_BRANCH=$CUSTOM_GIT_BRANCH
+# Placement
+PLACEMENT_REPO=$CUSTOM_GIT_BASE/placement.git
+PLACEMENT_BRANCH=$CUSTOM_GIT_BRANCH
+# Glance
+GLANCE_REPO=$CUSTOM_GIT_BASE/glance.git
+GLANCE_BRANCH=$CUSTOM_GIT_BRANCH
+GLANCE_LIMIT_IMAGE_SIZE_TOTAL=10000
+# Neutron
+NEUTRON_REPO=$CUSTOM_GIT_BASE/neutron.git
+NEUTRON_BRANCH=$CUSTOM_GIT_BRANCH
+# Cinder
+CINDER_REPO=$CUSTOM_GIT_BASE/cinder.git
+CINDER_BRANCH=$CUSTOM_GIT_BRANCH
+# Horizon
+HORIZON_REPO=$CUSTOM_GIT_BASE/horizon.git
+HORIZON_BRANCH=$CUSTOM_GIT_BRANCH
+# Swift
+ENABLED_SERVICES+=,swift
+SWIFT_REPO=$CUSTOM_GIT_BASE/swift.git
+SWIFT_BRANCH=$CUSTOM_GIT_BRANCH
+SWIFT_HASH=66a3d6b56c1f479c8b4e70ab5c2000f5
+SWIFT_REPLICAS=1
+
+# Skyline
+enable_plugin skyline-apiserver $CUSTOM_GIT_BASE/skyline-apiserver $CUSTOM_GIT_BRANCH
+
+# Barbican
+enable_plugin barbican $CUSTOM_GIT_BASE/barbican $CUSTOM_GIT_BRANCH
+
+# Heat
+enable_plugin heat $CUSTOM_GIT_BASE/heat $CUSTOM_GIT_BRANCH
+enable_plugin heat-dashboard $GIT_BASE/openstack/heat-dashboard $CUSTOM_GIT_BRANCH
+
+# Octavia
+# Octavia supports using QoS policies on the VIP port:
+enable_service q-qos
+enable_service placement-api placement-client
+# Octavia plugin
+enable_plugin octavia $CUSTOM_GIT_BASE/octavia $CUSTOM_GIT_BRANCH
+enable_plugin octavia-dashboard $GIT_BASE/openstack/octavia-dashboard $CUSTOM_GIT_BRANCH
+enable_plugin ovn-octavia-provider $GIT_BASE/openstack/ovn-octavia-provider $CUSTOM_GIT_BRANCH
+enable_service octavia o-api o-cw o-hm o-hk o-da
+
+# Trove Pre-requisites
+# IPV4_ADDRS_SAFE_TO_USE=10.111.0.0/26
+# FIXED_RANGE=10.111.0.0/26
+# NETWORK_GATEWAY=10.111.0.1
+# FLOATING_RANGE=172.30.5.0/24
+# PUBLIC_NETWORK_GATEWAY=172.30.5.1
+# ENABLED_SERVICES=rabbit,mysql,key
+# Trove
+enable_plugin trove $CUSTOM_GIT_BASE/trove $CUSTOM_GIT_BRANCH
+# Trove plugin
+enable_plugin trove-dashboard $GIT_BASE/openstack/trove-dashboard $CUSTOM_GIT_BRANCH
+# Neutron required for Trove
+enable_service q-svc
+# Disable Neutron agents not used with OVN.
+disable_service q-agt
+disable_service q-l3
+disable_service q-dhcp
+disable_service q-meta
+# Enable services, these services depend on neutron plugin.
+enable_service q-trunk
+enable_service q-dns
+enable_service q-port-forwarding
+enable_service q-qos
+enable_service neutron-segments
+enable_service q-log
+
+# Manila
+enable_plugin manila $CUSTOM_GIT_BASE/manila $CUSTOM_GIT_BRANCH
+enable_plugin manila-ui $GIT_BASE/openstack/manila-ui $CUSTOM_GIT_BRANCH
+enable_service manila m-api m-shr m-sch m-dat
+
+# Magnum
+enable_plugin magnum $CUSTOM_GIT_BASE/magnum $CUSTOM_GIT_BRANCH
+enable_plugin magnum-ui $GIT_BASE/openstack/magnum-ui $CUSTOM_GIT_BRANCH
+
+# Masakari
+enable_plugin masakari $CUSTOM_GIT_BASE/masakari $CUSTOM_GIT_BRANCH
+enable_plugin masakaridashboard $GIT_BASE/openstack/masakari-dashboard $CUSTOM_GIT_BRANCH
+
+# Aodh
+enable_plugin aodh $CUSTOM_GIT_BASE/aodh $CUSTOM_GIT_BRANCH
+
+# Ceilometer
+enable_plugin ceilometer $CUSTOM_GIT_BASE/ceilometer $CUSTOM_GIT_BRANCH
+
+# Gnocchi settings
+# Gnocchi is optional but can be enbaled by uncommenting CEILOMETER_BACKEND
+CEILOMETER_BACKEND=gnocchi
+
+# if gnocchi is not in LIBS_FROM_GIT it will install from pypi.
+# Currently this is broken with the latest gnocchi release 4.4.2
+# so we need to install from git until
+# https://github.com/gnocchixyz/gnocchi/issues/1290 is resolved
+LIBS_FROM_GIT+=gnocchi
+
+# to control the version of gnocchi installed from git uncomment these options
+GNOCCHI_REPO=https://github.com/gnocchixyz/gnocchi
+GNOCCHI_BRANCH="stable/4.6"
+
+# Tempest
+enable_service tempest
+enable_plugin octavia-tempest-plugin $GIT_BASE/openstack/octavia-tempest-plugin
+enable_plugin trove-tempest-plugin $GIT_BASE/openstack/trove-tempest-plugin
+enable_plugin neutron-tempest-plugin $GIT_BASE/openstack/neutron-tempest-plugin
+OVN_BUILD_MODULES=True
+ENABLE_CHASSIS_AS_GW=True
