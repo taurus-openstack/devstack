@@ -52,11 +52,9 @@ SWIFT_HASH=66a3d6b56c1f479c8b4e70ab5c2000f5
 SWIFT_REPLICAS=1
 
 # Skyline
-SKYLINE_APISERVER_REPO=$CUSTOM_GIT_BASE/skyline-apiserver.git
-SKYLINE_APISERVER_BRANCH=$CUSTOM_GIT_BRANCH
 SKYLINE_CONSOLE_REPO=$CUSTOM_GIT_BASE/skyline-console.git
 SKYLINE_CONSOLE_BRANCH=$CUSTOM_GIT_BRANCH
-enable_plugin skyline-apiserver
+enable_plugin skyline-apiserver $CUSTOM_GIT_BASE/skyline-apiserver $CUSTOM_GIT_BRANCH
 
 # Barbican
 enable_plugin barbican $CUSTOM_GIT_BASE/barbican $CUSTOM_GIT_BRANCH
